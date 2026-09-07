@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <title>Buzzer</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --bg-active: #b91c1c;
+      --btn-face: #ef4444;
+      --btn-rim: #7f1d1d;
+      --btn-text: #ffffff;
+      --reset-bg: #f8fafc;
+      --reset-text: #0f172a;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: var(--bg);
+      color: var(--btn-text);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      -webkit-user-select: none;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
+      overscroll-behavior: none;
+    }
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+    }
+
+    #app {
+      width: 100%;
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: clamp(1.25rem, 4vh, 2rem);
+      padding: max(1rem, env(safe-area-inset-top))
+               max(1rem, env(safe-area-inset-right))
+               max(1rem, env(safe-area-inset-bottom))
+               max(1rem, env(safe-area-inset-left));
+      background: var(--bg);
+      transition: background-color 0.15s ease;
+    }
+
+    #app.is-active {
+      background: var(--bg-active);
+      animation: flashPulse 0.45s ease-in-out infinite alternate;
+    }
+
+    @keyframes flashPulse {
+      from {
+        background-color: #b91c1c;
+        filter: brightness(1);
+      }
+      to {
+        background-color: #f97316;
+        filter: brightness(1.18);
+      }
+    }
+
+    .buzzer {
+      position: relative;
+      width: min(72vw, 72vh, 340px);
+      height: min(72vw, 72vh, 340px);
+      border: none;
+      border-radius: 50%;
+      background:
+        radial-gradient(circle at 35% 28%, #fca5a5 0%, var(--btn-face) 42%, #dc2626 78%, #991b1b 100%);
+      color: var(--btn-text);
+      font-size: clamp(1.75rem, 7vw, 2.75rem);
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow:
+        0 0 0 14px var(--btn-rim),
+        0 18px 0 #450a0a,
+        0 28px 40px rgba(0, 0, 0, 0.45);
+      touch-action: manipulation;
+      -webkit-user-select: none;
+      user-select: none;
+      transition: transform 0.08s ease, box-shadow 0.08s ease, filter 0.08s ease;
+    }
+
+    .buzzer:active:not(:disabled) {
+      transform: translateY(10px);
+      box-shadow:
+        0 0 0 14px var(--btn-rim),
+        0 8px 0 #450a0a,
+        0 14px 24px rgba(0, 0, 0, 0.4);
+      filter: brightness(0.92);
+    }
+
+    .buzzer:disabled {
+      cursor: default;
+      background:
+        radial-gradient(circle at 35% 28%, #fdba74 0%, #ea580c 42%, #c2410c 78%, #7c2d12 100%);
+      box-shadow:
+        0 0 0 14px #9a3412,
+        0 10px 0 #431407,
+        0 18px 28px rgba(0, 0, 0, 0.4);
+      transform: translateY(6px);
+    }
+
+    .reset {
+      display: none;
+      min-width: min(80vw, 320px);
+      min-height: 56px;
+      padding: 0.9rem 1.4rem;
+      border: none;
+      border-radius: 999px;
+      background: var(--reset-bg);
+      color: var(--reset-text);
+      font-size: clamp(1rem, 4.2vw, 1.25rem);
+      font-weight: 800;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+      touch-action: manipulation;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    .reset:active {
+      transform: scale(0.97);
+      filter: brightness(0.95);
+    }
+
+    #app.is-active .reset {
+      display: block;
+    }
+
+    @media (orientation: landscape) and (max-height: 500px) {
+      #app {
+        gap: 0.85rem;
+      }
+
+      .buzzer {
+        width: min(58vh, 240px);
+        height: min(58vh, 240px);
+        font-size: clamp(1.25rem, 6vh, 1.85rem);
+        box-shadow:
+          0 0 0 10px var(--btn-rim),
+          0 12px 0 #450a0a,
+          0 18px 28px rgba(0, 0, 0, 0.45);
+      }
+
+      .buzzer:active:not(:disabled) {
+        transform: translateY(7px);
+        box-shadow:
+          0 0 0 10px var(--btn-rim),
+          0 5px 0 #450a0a,
+          0 10px 18px rgba(0, 0, 0, 0.4);
+      }
+
+      .reset {
+        min-height: 48px;
+        min-width: min(70vw, 280px);
+      }
+    }
+  </style>
+</head>
+<body>
+  <main id="app" aria-live="polite">
+    <button
+      id="buzzer"
+      class="buzzer"
+      type="button"
+      aria-label="Aperte o buzzer"
+    >
+      APERTE!
+    </button>
+    <button
+      id="reset"
+      class="reset"
+      type="button"
+      aria-label="Parar e reiniciar"
+    >
+      PARAR / REINICIAR
+    </button>
+  </main>
+
+  <script>
+    (function () {
+      "use strict";
+
+      const app = document.getElementById("app");
+      const buzzerBtn = document.getElementById("buzzer");
+      const resetBtn = document.getElementById("reset");
+
+      let isArmed = true;
+      let isActive = false;
+
+      /**
+       * Camada de áudio isolada (start / stop / destroy).
+       * Troque SIREN_SRC ou a implementação abaixo para outro .mp3/.wav.
+       */
+      const SIREN_SRC = "sirene.mp3";
+      const sirenAudio = createFileSiren(SIREN_SRC);
+
+      function createFileSiren(src) {
+        let audio = null;
+        let started = false;
+        let runId = 0;
+
+        function ensureAudio() {
+          if (!audio) {
+            audio = new Audio(src);
+            audio.preload = "auto";
+            audio.loop = true;
+            audio.playsInline = true;
+          }
+          return audio;
+        }
+
+        // Prefetch no carregamento (ajuda no 1º toque no celular)
+        try {
+          ensureAudio().load();
+        } catch (_) {
+          /* ignore */
+        }
+
+        return {
+          async start() {
+            if (started) return;
+            started = true;
+            const myRun = ++runId;
+            const el = ensureAudio();
+
+            try {
+              el.pause();
+              el.currentTime = 0;
+              el.volume = 1;
+              const playPromise = el.play();
+              if (playPromise && typeof playPromise.then === "function") {
+                await playPromise;
+              }
+            } catch (_) {
+              if (myRun === runId) started = false;
+              return;
+            }
+
+            if (myRun !== runId || !started) {
+              try {
+                el.pause();
+                el.currentTime = 0;
+              } catch (_) {
+                /* ignore */
+              }
+            }
+          },
+
+          stop() {
+            runId += 1;
+            started = false;
+            if (!audio) return;
+
+            try {
+              audio.pause();
+              audio.currentTime = 0;
+            } catch (_) {
+              /* ignore */
+            }
+          },
+
+          destroy() {
+            this.stop();
+            if (audio) {
+              try {
+                audio.removeAttribute("src");
+                audio.load();
+              } catch (_) {
+                /* ignore */
+              }
+              audio = null;
+            }
+          }
+        };
+      }
+
+      function activate() {
+        if (!isArmed || isActive) return;
+
+        isArmed = false;
+        isActive = true;
+
+        app.classList.add("is-active");
+        buzzerBtn.textContent = "ACIONADO!";
+        buzzerBtn.disabled = true;
+        buzzerBtn.setAttribute("aria-label", "Buzzer acionado");
+
+        sirenAudio.start();
+      }
+
+      function reset() {
+        if (!isActive) return;
+
+        sirenAudio.stop();
+
+        isActive = false;
+        isArmed = true;
+
+        app.classList.remove("is-active");
+        buzzerBtn.textContent = "APERTE!";
+        buzzerBtn.disabled = false;
+        buzzerBtn.setAttribute("aria-label", "Aperte o buzzer");
+      }
+
+      function onBuzzerPointer(event) {
+        event.preventDefault();
+        activate();
+      }
+
+      function onResetPointer(event) {
+        event.preventDefault();
+        reset();
+      }
+
+      buzzerBtn.addEventListener("pointerdown", onBuzzerPointer, { passive: false });
+      resetBtn.addEventListener("pointerdown", onResetPointer, { passive: false });
+
+      buzzerBtn.addEventListener("click", function (event) {
+        event.preventDefault();
+      });
+      resetBtn.addEventListener("click", function (event) {
+        event.preventDefault();
+      });
+
+      document.addEventListener("visibilitychange", function () {
+        if (document.hidden && isActive) {
+          reset();
+        }
+      });
+
+      window.addEventListener("pagehide", function () {
+        sirenAudio.destroy();
+        isActive = false;
+        isArmed = true;
+      });
+
+      document.addEventListener("gesturestart", function (event) {
+        event.preventDefault();
+      });
+    })();
+  </script>
+</body>
+</html>
